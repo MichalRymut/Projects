@@ -1,0 +1,74 @@
+﻿Sub Main()
+	Dim ass As AssemblyDocument = ThisApplication.ActiveDocument
+	Dim oSelSet As SelectSet = ass.SelectSet
+	If oSelSet.Count = 0 Then
+		MessageBox.Show("Proszę wybrać pliki przed uruchomieniem polecenia", "Error")
+		Exit Sub
+	End If
+	'this runs the custom Function defined below to return a selected folder path
+	oFolder = GetFolder
+	'make sure a folder was selected, if not exit rule
+	If String.IsNullOrEmpty(oFolder) Then Exit Sub
+	Dim i As Integer = 0
+	Dim result As Boolean
+	Dim Occ As ComponentOccurrence
+	For Each Occ In oSelSet
+		Dim OccDoc As Document = Occ.Definition.Document
+		'get file name (without path & without file extension)
+		oName = System.IO.Path.GetFileNameWithoutExtension(OccDoc.FullFileName)
+		'put new STEP file name together
+		oNewName = oFolder & "\" & oName & ".stp"
+		result = ExportToSTEP(OccDoc, oNewName)
+		If result = True Then
+			i = i + 1
+		End If
+	Next
+	MessageBox.Show("Liczba zapisanych plików: " & i, "Wynik zapisu")
+End Sub
+
+'Here's the subroutine.
+Function ExportToSTEP(doc As Document, NewFileName As String) As Boolean
+	' Get the STEP translator Add-In.
+	Dim oSTEPTranslator As TranslatorAddIn
+	oSTEPTranslator = ThisApplication.ApplicationAddIns.ItemById("{90AF7F40-0C01-11D5-8E83-0010B541CD80}")
+	If oSTEPTranslator Is Nothing Then
+		MsgBox("Could not access STEP translator.")
+		ExportToSTEP = False
+		Exit Function
+	End If
+
+	oContext = ThisApplication.TransientObjects.CreateTranslationContext
+	oContext.Type = IOMechanismEnum.kFileBrowseIOMechanism
+	oOptions = ThisApplication.TransientObjects.CreateNameValueMap
+	oData = ThisApplication.TransientObjects.CreateDataMedium
+	oData.FileName = NewFileName
+	
+	If oSTEPTranslator.HasSaveCopyAsOptions(doc, oContext, oOptions) Then
+		' Set application protocol.
+		' 2 = AP 203 - Configuration Controlled Design
+		' 3 = AP 214 - Automotive Design
+		oOptions.Value("ApplicationProtocolType") = 3
+		'oOptions.Value("Author") = ""
+		'oOptions.Value("Authorization") = ""
+		'oOptions.Value("Description") = ""
+		'oOptions.Value("Organization") = ""
+
+		oSTEPTranslator.SaveCopyAs(doc, oContext, oOptions, oData)
+		ExportToSTEP = True
+    End If
+End Function
+
+Function GetFolder() As String
+	'Imports System.Windows.Forms
+	Dim oSFolder As String
+	Dim oFDialog As New System.Windows.Forms.FolderBrowserDialog
+	oFDialog.Description = "Wybierz folder do zapisu plików .step."
+	oFDialog.RootFolder = System.Environment.SpecialFolder.MyComputer
+	Dim oResult As DialogResult = oFDialog.ShowDialog()
+	If oResult = DialogResult.OK Then
+		oSFolder = oFDialog.SelectedPath
+	Else
+		Return String.Empty
+	End If
+	Return oSFolder
+End Function

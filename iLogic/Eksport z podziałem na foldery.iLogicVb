@@ -1,0 +1,115 @@
+﻿Sub Main
+	Dim mainDoc As AssemblyDocument = TryCast(ThisApplication.ActiveDocument, AssemblyDocument)
+	If IsNothing(mainDoc) Then Exit Sub
+
+	Dim mainFolder As String = System.IO.Path.GetDirectoryName(mainDoc.FullFileName) & "\" & System.IO.Path.GetFileNameWithoutExtension(mainDoc.FullFileName)
+	
+	Call VerifyPath(mainFolder)
+	
+	Call StepDown(mainFolder, mainDoc.ComponentDefinition.Occurrences)
+	
+End Sub
+
+Sub VerifyPath(folderPath As String)
+	
+	If Not System.IO.Directory.Exists(folderPath) Then
+	    System.IO.Directory.CreateDirectory(folderPath)
+	End If
+	
+End Sub
+
+Sub StepDown(oFolder As String, oComps As ComponentOccurrences)
+	For Each oComp As ComponentOccurrence In oComps
+		
+		If oComp.DefinitionDocumentType = DocumentTypeEnum.kPartDocumentObject
+			
+			Dim sprawdzacz As String
+			Dim sprawdzacz2 As String
+			Dim decyzja As String
+			Dim decyzja2 As String
+			
+			Try
+				sprawdzacz = oComp.Definition.Document.PropertySets(4).Item("Opis").Value
+				If sprawdzacz = "Element systemu Aluprof"
+					decyzja = "nie generuj"
+					Else
+						decyzja = "generuj"
+					End If
+			Catch
+				decyzja = "generuj"
+			End Try
+			
+			Try
+				sprawdzacz2 = oComp.Definition.Document.PropertySets(4).Item("Typ elementu").Value
+				If sprawdzacz2 = "Łącznik"
+					decyzja2 = "nie generuj"
+					Else
+						decyzja2 = "generuj"
+					End If
+			Catch
+				decyzja2 = "generuj"
+			End Try
+		
+		If decyzja = "generuj" And decyzja2 = "generuj"
+			Try	
+			
+			ExportToSTEP(oComp.Definition.Document, oFolder)
+			
+		Catch
+		 question = MessageBox.Show("Znaleziono wyłączony Element:" & vbLf & oComp.Name & vbLf & "Czy chcesz zatrzymać generowanie plików .step?", "Wyłączony element", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+					If question = vbYes Then
+		 Return
+	 		
+	 End If
+ 		
+		End Try
+		End If
+		
+		Else If oComp.DefinitionDocumentType = DocumentTypeEnum.kAssemblyDocumentObject
+			Dim newFolder As String = oFolder & "\" & System.IO.Path.GetFileNameWithoutExtension(oComp.Definition.Document.FullFileName)
+			
+			Call VerifyPath(newFolder)
+			
+			ExportToSTEP(oComp.Definition.Document, newFolder)
+	
+			Call StepDown(newFolder, oComp.Definition.Occurrences)
+		End If
+	Next
+End Sub
+
+Function ExportToSTEP(doc As Document, fName As String) As Boolean
+	
+	Dim newstepFileName As String = fName & "\" & System.IO.Path.GetFileNameWithoutExtension(doc.FullFileName) & ".stp"
+	
+	If System.IO.File.Exists(newstepFileName)
+		'Do you want to overwrite if this file already exists?
+		Exit Function
+		'Aleternate:
+		System.IO.File.Delete(newstepFileName)
+	End If
+	
+	Logger.Trace("About to create file @ full path: " & newstepFileName)
+
+    Dim oSTEPTranslator As TranslatorAddIn = ThisApplication.ApplicationAddIns.ItemById("{90AF7F40-0C01-11D5-8E83-0010B541CD80}")
+
+    If oSTEPTranslator Is Nothing Then
+        MsgBox("Could not access STEP translator.")
+		ExportToSTEP=False
+        Exit Function
+    End If
+
+    Dim oContext As TranslationContext = ThisApplication.TransientObjects.CreateTranslationContext
+    Dim oOptions As NameValueMap = ThisApplication.TransientObjects.CreateNameValueMap
+    If oSTEPTranslator.HasSaveCopyAsOptions(doc, oContext, oOptions) Then
+        ' Set application protocol.
+        ' 2 = AP 203 - Configuration Controlled Design
+        ' 3 = AP 214 - Automotive Design
+        oOptions.Value("ApplicationProtocolType") = 3
+        oContext.Type = kFileBrowseIOMechanism
+
+        Dim oData As DataMedium = ThisApplication.TransientObjects.CreateDataMedium
+		oData.FileName = newstepFileName
+        Call oSTEPTranslator.SaveCopyAs(doc, oContext, oOptions, oData)
+		ExportToSTEP=True
+    End If
+End Function

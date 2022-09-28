@@ -1,0 +1,59 @@
+﻿customPropertySet = ThisDoc.Document.PropertySets.Item("Inventor User Defined Properties")
+
+Dim iprop(7) As String
+iprop(1) = "Kod elementu"
+iprop(2) = "Długość"
+iprop(3) = "Opis"
+iprop(4) = "Materiał"
+iprop(5) = "Wykończenie"
+iprop(6) = "Uwagi"
+iprop(7) = "Typ elementu"
+
+Dim wartosc(7) As String
+wartosc(1) = "Profil R70x70X3"
+wartosc(2) = ""
+wartosc(3) = "Profil R70x70X3"
+wartosc(4) = "Stal 235"
+wartosc(5) = "Ocynk. ogn."
+wartosc(6) = ""
+wartosc(7) = "Profil"
+
+
+
+For k = 1 To 7
+Dim prop(k) As String
+    Try
+        prop(k) = iProperties.Value("Custom", iprop(k))
+    Catch
+        'Assume error means not found
+        customPropertySet.Add("", iprop(k))
+        iProperties.Value("Custom", iprop(k)) = "null"
+    End Try
+Next
+
+
+
+For j = 2 To 2
+    Dim var(j) As String
+    
+        var(j) = InputBox("Proszę wpisać wartość dla: " & iprop(j), "Warning", iProperties.Value("Custom", iprop(j)))
+        iProperties.Value("Custom", iprop(j)) = var(j)
+   
+Next
+
+
+For j = 1 To 1
+    Dim var(j) As String
+        iProperties.Value("Custom", iprop(j)) = wartosc(j)
+Next
+
+
+For j = 3 To 7
+    Dim var(j) As String
+        iProperties.Value("Custom", iprop(j)) = wartosc(j)
+Next
+
+
+
+iProperties.Material = "Stal S235"
+iProperties.PartColor = "Częściowo polerowany"

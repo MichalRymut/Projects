@@ -1,0 +1,135 @@
+﻿customPropertySet = ThisDoc.Document.PropertySets.Item("Inventor User Defined Properties")
+
+Dim iprop(7) As String
+iprop(1) = "Kod elementu"
+iprop(2) = "Opis"
+iprop(3) = "Długość"
+iprop(4) = "Materiał"
+iprop(5) = "Wykończenie"
+iprop(6) = "Uwagi"
+iprop(7) = "Typ elementu"
+
+For k = 1 To 7
+Dim prop(k) As String
+    Try
+        prop(k) = iProperties.Value("Custom", iprop(k))
+    Catch
+        'Assume error means not found
+        customPropertySet.Add("", iprop(k))
+        iProperties.Value("Custom", iprop(k)) = "null"
+    End Try
+Next
+
+For j = 1 To 1
+    Dim var(j) As String
+If j = 1 Or j = 2 Or j = 3 Or j = 4 Or j = 5 Then
+    If iProperties.Value("Custom", iprop(j)) = "null" Or iProperties.Value("Custom", iprop(j)) = "" Then
+        var(j) = InputBox("Proszę wpisać wartość dla: " & iprop(j) & " (Nr katalogowy)", "Warning", "")
+        iProperties.Value("Custom", iprop(j)) = var(j)
+		Else
+			If j = 1 Or j= 2 Or j= 4 Then
+			question = MessageBox.Show(iprop(j) & " Nr katalogowy" & " jest już określony: " & vbLf & iProperties.Value("Custom", iprop(j)) & vbLf & "Czy chcesz zmienić " & iprop(j) & " (Nr katalogowy)" & "?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+				If question = vbYes Then
+				var(j) = InputBox("Proszę wpisać nową wartość dla: " & iprop(j)  &  " (Nr katalogowy)", "Warning", iProperties.Value("Custom", iprop(j)))
+        		iProperties.Value("Custom", iprop(j)) = var(j)
+				End If
+
+			End If
+	    End If
+	Else 
+		
+		 If iProperties.Value("Custom", iprop(j)) = "null" Or iProperties.Value("Custom", iprop(j)) = "" Then
+        var(j) = ""
+        iProperties.Value("Custom", iprop(j)) = var(j)
+	End If
+		
+	End If
+Next
+
+For j = 2 To 6
+    Dim var(j) As String
+If j = 1 Or j = 2 Or j = 3 Or j = 4 Or j = 5 Or j = 6 Then
+    If iProperties.Value("Custom", iprop(j)) = "null" Or iProperties.Value("Custom", iprop(j)) = "" Then
+        var(j) = InputBox("Proszę wpisać wartość dla: " & iprop(j), "Warning", "")
+        iProperties.Value("Custom", iprop(j)) = var(j)
+		Else
+			If j = 1 Or j= 2 Or j= 4 Then
+			question = MessageBox.Show(iprop(j) & " jest już określony: " & vbLf & iProperties.Value("Custom", iprop(j)) & vbLf & "Czy chcesz zmienić " & iprop(j) & "?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+				If question = vbYes Then
+				var(j) = InputBox("Proszę wpisać nową wartość dla: " & iprop(j), "Warning", iProperties.Value("Custom", iprop(j)))
+        		iProperties.Value("Custom", iprop(j)) = var(j)
+				End If
+			Else
+				If j = 3 Then
+				question = MessageBox.Show(iprop(j) & " jest już określona: " & vbLf & iProperties.Value("Custom", iprop(j)) & vbLf & "Czy chcesz zmienić " & iprop(j) & "?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+					If question = vbYes Then
+					var(j) = InputBox("Proszę wpisać nową wartość dla: " & iprop(j), "Warning", iProperties.Value("Custom", iprop(j)))
+        			iProperties.Value("Custom", iprop(j)) = var(j)
+					End If
+				Else
+					If j = 5 Then
+					question = MessageBox.Show(iprop(j) & " jest już określone: " & vbLf & iProperties.Value("Custom", iprop(j)) & vbLf & "Czy chcesz zmienić " & iprop(j) & "?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+						If question = vbYes Then
+						var(j) = InputBox("Proszę wpisać nową wartość dla: " & iprop(j), "Warning", iProperties.Value("Custom", iprop(j)))
+        				iProperties.Value("Custom", iprop(j)) = var(j)
+						End If
+					End If
+				End If
+			End If
+	    End If
+	Else 
+		
+		 If iProperties.Value("Custom", iprop(j)) = "null" Or iProperties.Value("Custom", iprop(j)) = "" Then
+        var(j) = ""
+        iProperties.Value("Custom", iprop(j)) = var(j)
+	End If
+		
+	End If
+Next
+
+
+	For j = 7 To 7
+    Dim var(j) As String
+If j = 7 Or j = 2 Or j = 3 Or j = 4 Or j = 5 Then
+    If iProperties.Value("Custom", iprop(j)) = "null" Or iProperties.Value("Custom", iprop(j)) = "" Then
+	
+	Dim oVals As New List(Of String)
+	oVals.AddRange({"Łącznik", "Blacha", "Profil", "Akcesorium", "Materiał Izolacyjny", "Uszczelka", "Konsole"})
+	oChosen = InputListBox("Wybierz Typ elementu", oVals, "", "Potrzebne informacje")
+        iProperties.Value("Custom", iprop(j)) = oChosen
+		var(j) = oChosen
+		
+		Else
+			If j = 7 Or j= 2 Or j= 4 Then
+			question = MessageBox.Show(iprop(j) & " Typ elementu" & " jest już określony: " & vbLf & iProperties.Value("Custom", iprop(j)) & vbLf & "Czy chcesz zmienić " & iprop(j) & " Typ elementu" & "?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+				If question = vbYes Then
+					
+				Dim oVals As New List(Of String)
+		oVals.AddRange({"Łącznik", "Blacha", "Profil", "Akcesorium", "Materiał Izolacyjny", "Uszczelka", "Konsole"})
+		oChosen = InputListBox("Wybierz Typ elementu", oVals, "", "Potrzebne informacje")
+        iProperties.Value("Custom", iprop(j)) = oChosen
+		var(j) = oChosen
+				
+				End If
+
+			End If
+	    End If
+	Else 
+		
+		 If iProperties.Value("Custom", iprop(j)) = "null" Or iProperties.Value("Custom", iprop(j)) = "" Then
+        var(j) = ""
+        iProperties.Value("Custom", iprop(j)) = var(j)
+	End If
+		
+	End If
+Next
+	
+	
+	
+	
+	
+	
+	
+	
+	
+

@@ -1,0 +1,153 @@
+﻿
+customPropertySet = ThisDoc.Document.PropertySets.Item("Inventor User Defined Properties")
+
+Dim iprop(2) As String
+iprop(1) = "Materiał"
+iprop(2) = "Uwagi"
+
+
+For k = 1 To 2
+Dim prop(k) As String
+    Try
+        prop(k) = iProperties.Value("Custom", iprop(k))
+    Catch
+        'Assume error means not found
+        customPropertySet.Add("", iprop(k))
+        iProperties.Value("Custom", iprop(k)) = "null"
+    End Try
+Next
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Ocynk galwaniczny kl. 8.8"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Warsztat"
+Next
+
+Dim Name As String
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Warsztat\Ocynk galwaniczny" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Ocynk ogniowy kl. 8.8"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Warsztat"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Warsztat\Ocynk ogniowy" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Stal A2 kl. 70"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Warsztat"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Warsztat\Stal A2" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Stal A4 kl. 70"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Warsztat"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Warsztat\Stal A4" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Ocynk galwaniczny kl. 8.8"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Budowa"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Budowa\Ocynk galwaniczny" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Ocynk ogniowy kl. 8.8"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Budowa"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Budowa\Ocynk ogniowy" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Stal A2 kl. 70"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Budowa"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Budowa\Stal A2" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+For j = 1 To 1
+iProperties.Value("Custom", iprop(j)) = "Stal A4 kl. 70"
+Next
+
+For j = 2 To 2
+iProperties.Value("Custom", iprop(j)) = "Budowa"
+Next
+
+
+Name = ThisDoc.Path & "\" & Nr_fasady & "_" & Nr_elementu & ".ipt"
+Name = "P:\2110 - WF II\04 RYSUNKI\04.00 POMOCE\łączniki-Step\Budowa\Stal A4" & "\" & ThisDoc.FileName & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	

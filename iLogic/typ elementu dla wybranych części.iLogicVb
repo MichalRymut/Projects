@@ -1,0 +1,104 @@
+﻿'Description of the Rule and if you want to continue
+ Result = MessageBox.Show("To polecenie pozwala wybrać elementy, do których po zatwierdzeniu przyciskiem Esc dodane zostaną iproperty" _
+& vbNewLine &"" _
+& vbNewLine & "Czy chcesz kontynuować?" _
+& vbNewLine & "", "Wybierz akcje" _
+, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2)
+
+If Result = vbNo Then
+	MessageBox.Show ("Polecenie anulowane", "Powiadomienie")
+ElseIf Result = vbYes Then
+	
+	Dim oDoc As AssemblyDocument
+	oDoc = ThisDoc.Document
+	oCompDef = oDoc.ComponentDefinition
+
+	Dim oSet As HighlightSet
+	oSet = oDoc.CreateHighlightSet
+	'MessageBox.Show ("Rule will Run", "Title")
+	'[Pick Assembly Occurrences
+	Dim comps As ObjectCollection
+	Dim comp As Object
+
+	comps = ThisApplication.TransientObjects.CreateObjectCollection
+
+	While True
+		comp = ThisApplication.CommandManager.Pick(
+			SelectionFilterEnum.kAssemblyLeafOccurrenceFilter, 
+			"Wybierz części") 
+
+		' If nothing gets selected then we're done	
+		If IsNothing(comp) Then Exit While
+			comps.Add(comp)
+			oSet.AddItem(comp)
+	End While
+	'Description of the Rule and if you want to continue
+	Result = MessageBox.Show("Czy chcesz uruchomić polecenie dla wybranych części?", "Uruchom na wybranych częściach", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2)
+
+	If Result = vbNo Then
+	MessageBox.Show ("Polecenie anulowane", "iLogic")
+
+	 'If there are selected Components we can Do something
+	ElseIf Result = vbYes Then
+		For Each comp In comps
+			'Pick only parts
+			If comp.DefinitionDocumentType = kPartDocumentObject Then
+				'Get document of each occurrence
+				Dim oOccDoc As Document
+				oOccDoc = comp.Definition.Document
+				'[Add custom iProp
+				customPropertySet = oOccDoc.PropertySets.Item("Inventor User Defined Properties")
+				Dim iprop(1) As String
+				
+				iprop(1) = "Materiał"
+				
+				For k = 1 To 1
+				Dim prop(k) As String
+				    Try
+				        prop(k) = iProperties.Value(oOccDoc.DisplayName,"Custom", iprop(k))
+				    Catch
+				        'Assume error means not found
+				        customPropertySet.Add("", iprop(k))
+				        iProperties.Value(oOccDoc.DisplayName,"Custom", iprop(k)) = "null"
+				    End Try
+				Next
+				
+				MessageBox.Show("Wprowadź iproperty dla: " & comp.Name, "iLogic")
+			
+				For j = 1 To 1
+
+Dim var(j) As String
+   	If iProperties.Value(oOccDoc.DisplayName, "Custom", iprop(j)) = "null" Or iProperties.Value(oOccDoc.DisplayName, "Custom", iprop(j)) = "" Then
+	
+var(j) = "Ocynk galwaniczny kl. 8.8"
+
+	iProperties.Value(oOccDoc.DisplayName,"Custom", iprop(j)) = var(j)
+	
+
+	Else
+
+		question = MessageBox.Show(iprop(j) & " jest juz okreslony: " & vbLf & iProperties.Value(oOccDoc.DisplayName,"Custom", iprop(j)) & vbLf & "Czy chcesz zmienic " & iprop(j) & "?", "IProperty juz okreslone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+		If question = vbYes Then
+			
+			var(j) = "Ocynk galwaniczny kl. 8.8"
+
+	iProperties.Value(oOccDoc.DisplayName,"Custom", iprop(j)) = var(j)
+		End If
+	End If
+Next
+
+				
+				']
+				MessageBox.Show ("Zakończono dodawanie iproperty dla: " & comp.Name, "iLogic")
+			Else
+				MessageBox.Show ("Plik złożenia:-" & comp.Name & " został wybrany, więc zostaje pominięty", "iLogic")
+			End If
+		
+	
+		Next
+	MessageBox.Show("Zakończono dodawanie dla wszystkich wybranych części", "iLogic")
+	'Clear Highlighting
+	oSet.Clear()
+	End If
+']
+End If

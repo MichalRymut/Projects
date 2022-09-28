@@ -1,0 +1,362 @@
+﻿Sub Main()
+Dim Autor As String
+Dim material(10) As String
+material(1) = "Aluminium EN AW-6060 T66"
+material(2) = "PE"
+material(3) = "EPDM"
+material(4) = "HPVC"
+material(5) = "PA"
+material(6) = "Polipropylen"
+material(7) = "Aluminium EN AW-1050"
+material(8) = "A2"
+material(9) = "Stal S235JR"
+material(10) = "ALU-BUTYL"
+'material(11) = "Wpisz materiał"
+'material(12) = "Wpisz materiał"
+Dim wyglad(10) As String
+wyglad(1) = "biały"
+wyglad(2) = "Gładki — w kolorze złamanej bieli"
+wyglad(3) = "Kauczuk — czarny"
+wyglad(4) = "biały"
+wyglad(5) = "Nylon 6"
+wyglad(6) = "Gładki — popielaty"
+wyglad(7) = "biały"
+wyglad(8) = "Częściowo polerowany"
+wyglad(9) = "Częściowo polerowany"
+wyglad(10) = "Kauczuk — czarny"
+'wyglad(11) = "wpisz wygląd"
+'wyglad(12) = "wpisz wygląd"
+
+
+
+
+question1 = MessageBox.Show("Czy otwarta część jest elementem z katalogu?", "Potrzebne informacje", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+
+If question1 = vbNo Then
+	
+
+i = InputBox("Proszę wprowadzić numer odpowiadający dobranemu materiałowi:"  & vbLf & " "  & vbLf &  "1 dla Aluminium EN AW-6060 T66(Kształtowniki, wsporniki oraz łączniki aluminiowe)"  & vbLf & " "  & vbLf &  "2 dla PE (Izolatory termiczne oraz uszczelki - przekroje kropkowane)"  & vbLf & " "  & vbLf &  "3 dla EPDM (Uszczelki i elementy uszczelniające - przekroje ciemne/czarne)"  & vbLf & " "  & vbLf &  "4 dla HPVC (izolatory termiczne - przekroje przecinające się kreskowanie)"  & vbLf & " "  & vbLf &  "5 dla PA (Rzygacz oraz mniejsze podkładki pod szybę)"  & vbLf & " "  & vbLf &  "6 dla PP (Większe podkładki pod szyby)"  & vbLf & " "  & vbLf &  "7 dla Aluminium 1050 (Blachy aluminiowe gr>1.5)"  & vbLf & " "  & vbLf &  "8 dla A2 (elementy złączne typu śruby itd)"  & vbLf & " "  & vbLf &  "9 dla Stal S235JR (konsole i blachy stalowe)"  & vbLf & " "  & vbLf &  "10 dla ALU-BUTYL (taśmy butylowe)"  & vbLf & " "  & vbLf &  "Wprowadź: ''inny'' aby wpisać materiał ręcznie", "Wybierz materiał")
+	
+If i = "6" Then
+
+					iProperties.Material = material(i)
+					iProperties.PartColor = wyglad(i)
+					
+					
+				Else 
+					
+					If i = "inny"
+						
+						Try
+		MessageBox.Show("Zostaniesz poproszony o wprowadzenie materiału ręcznie" & vbLf & "Uwaga! Wprowadzony ręcznie materiał nie zmieni koloru modelu!" & vbLf & "Kolor należy wybrać ręcznie w przeglądarce Inventora", "Uwaga!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					Dim wlasny As String
+					wlasny = InputBox("Wpisz materiał: ", "Wpisz dane", "")
+						
+						'Funkcja tworzenia i ustawiania materiału
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wlasny, wlasny, wlasny)
+					 Catch
+					 End Try
+					iProperties.Material = wlasny
+					iProperties.PartColor = "Domyślna"
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & wlasny, "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+								Catch
+	MessageBox.Show("Błąd! Materiał nie może mieć pustej nazwy!", "BŁĄD!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+	Try
+	Dim wlasny As String
+					wlasny = InputBox("Wpisz materiał: ", "Wpisz dane", "")
+						
+						'Funkcja tworzenia i ustawiania materiału
+					
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wlasny, wlasny, wlasny)
+					 Catch
+					 End Try
+					iProperties.Material = wlasny
+					iProperties.PartColor = "Domyślna"
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & wlasny, "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+				Catch 
+						MessageBox.Show("No nie mogę", "Przecież mówiłem!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					End Try
+	End Try
+					
+				Else 
+					
+					Try
+						
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wyglad(i), material(i), material(i))
+					 Catch
+					 End Try
+					iProperties.Material = material(i)
+					iProperties.PartColor = wyglad(i)
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & material(i), "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					
+					Catch
+	MessageBox.Show("Błąd! Nie wprowadzono numeru z listy!", "BŁĄD!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+
+	End Try
+					
+				end if
+					
+				End If
+
+		End If
+		
+		
+		
+		If question1 = vbYes Then
+			
+		question2 = MessageBox.Show("Czy część jest kształtownikiem?", "Potrzebne informacje", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+		
+		If question2 = vbYes Then
+			
+		question3 = MessageBox.Show("Według katalogu wszystkie kształtowniki są wykonane z Aluminium EN AW-6060 T66" & vbLf & "Czy użyć Aluminium EN AW-6060 T66 jako materiału dla tej części?", "Potrzebne informacje", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+		
+		If question3 = vbYes Then
+		
+		Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wyglad(1), material(1), material(1))
+					 Catch
+					 End Try
+					iProperties.Material = material(1)
+					iProperties.PartColor = wyglad(1)
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & material(1), "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+				End If
+				
+		If question3 = vbNo Then
+			Try
+		MessageBox.Show("Zostaniesz poproszony o wprowadzenie materiału ręcznie" & vbLf & "Uwaga! Wprowadzony ręcznie materiał nie zmieni koloru modelu!" & vbLf & "Kolor należy wybrać ręcznie w przeglądarce Inventora", "Uwaga!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					Dim wlasny As String
+					wlasny = InputBox("Wpisz materiał: ", "Wpisz dane", "")
+						
+						'Funkcja tworzenia i ustawiania materiału
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wlasny, wlasny, wlasny)
+					 Catch
+					 End Try
+					iProperties.Material = wlasny
+					iProperties.PartColor = "Domyślna"
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & wlasny(i), "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+								Catch
+	MessageBox.Show("Błąd! Materiał nie może mieć pustej nazwy!", "BŁĄD!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+	try
+	Dim wlasny As String
+					wlasny = InputBox("Wpisz materiał: ", "Wpisz dane", "")
+						
+						'Funkcja tworzenia i ustawiania materiału
+					
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wlasny, wlasny, wlasny)
+					 Catch
+					 End Try
+					iProperties.Material = wlasny
+					iProperties.PartColor = "Domyślna"
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & wlasny(i), "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+				Catch 
+						MessageBox.Show("No nie mogę", "Przecież mówiłem!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					End Try
+	End Try
+				End If
+				
+			End If
+			
+			
+		If question2 = vbNo Then	
+		
+		
+
+       c = InputBox("Wpisz numer katalogowy części", "Potrzebne informacje", ) 
+    
+		
+	
+
+If c = "80462202" Or c = "80453039" Or c = "80453040" Or c = "80453041" Or c = "80453042" Or c = "80453043" Or c = "80462105" Then
+i = 5
+End If
+
+If c = "120604" Or c = "120605" Or c = "121671" Or c = "121036" Or c = "121037" Or c = "121040" Or c = "121332" Or c = "121158" Then 
+i = 2
+End If
+
+If c = "80311079" Or c = "80311082" Or c = "80311083" Then 
+i = 3
+End If
+
+If c = "009029" Or c = "009067" Or c = "009068" Or c = "009245" Or c = "009246" Or c = "009247" Or c = "009248" Or c = "009249" Or c = "009250" Or c = "009252" Or c = "009253" Then 
+i = 4
+End If
+
+If c = "80453045" Or c = "80490073" Or c = "80453186" Or c = "80453143" Then 
+i = 6
+End If
+
+If c = "120480" Or c = "120481" Or c = "120482" Or c = "120483" Or c = "120484" Or c = "120485" Or c = "120486" Or c = "120487" Or c = "120488" Or c = "120489" Or c = "120493" Or c = "120552" Or c = "120562" Or c = "120572" Or c = "120573" Or c = "120574" Or c = "120575" Or c = "120576" Or c = "120593" Or c = "120594" Or c = "120840" Or c = "120841" Or c = "120842" Or c = "120843" Or c = "120844" Or c = "120492" Or c = "120557" Or c = "120778" Or c = "121578" Or c = "121579" Or c = "121580" Or c = "121581" Or c = "120937" Or c = "120963" Or c = "121160" Or c = "121161" Or c = "121162" Or c = "121163" Or c = "121672" Or c = "121673" Or c = "121674" Or c = "121675" Or c = "120615" Or c = "120698" Or c = "121676" Then
+i = 3
+End If
+
+If c = "80130324" Or c = "80130313" Or c = "80130325" Or c = "80130326" Or c = "80130327" Or c = "80130328" Or c = "80199955" Or c = "80199956" Or c = "80199893" Or c = "80199892" Or c = "80199891" Or c = "80199890" Or c = "80199936" Or c = "80199957" Or c = "80199958" Or c = "80199937" Or c = "80199962" Or c = "80199963" Or c = "80199964" Or c = "80199965" Or c = "80199966" Or c = "80199967" Or c = "80199968" Or c = "80199969" Or c = "80199961" Or c = "80199951" Or c = "80199952" Or c = "80199953" Or c = "80199954" Or c = "80199043" Or c = "80199042" Or c = "80130399" Or c = "80130398" Or c = "80130375" Or c = "80130374" Or c = "80122200" Or c = "80122201" Or c = "80122202" Or c = "80122207" Or c = "80122203" Or c = "80122206" Or c = "80122208" Or c = "80122209" Or c = "80130314" Or c = "80130315" Or c = "80130316" Or c = "80130320" Or c = "80130321" Or c = "80130322" Or c = "80130323" Or c = "8013555X" Or c = "8013557X" Then
+i = 1
+End If
+
+If c = "120616" Or c = "120632" Or c = "120633" Or c = "120634" Then 
+i = 10
+End If
+
+If c = "80371219" Or c = "80371220" Or c = "80371221" Or c = "80371222" Or c = "80371223" Or c = "80371292" Or c = "80371215" Or c = "80371214" Or c = "80371293" Or c = "80371216" Or c = "80371217" Or c = "80371218" Or c = "87252721" Or c = "87252722" Or c = "87252505" Or c = "87252407" Or c = "87252408" Or c = "87252405" Or c = "87252403" Or c = "87252303" Or c = "87252204" Or c = "87252203" Or c = "87222403" Or c = "87222406" Or c = "87222407" Or c = "87222408" Or c = "87222409" Or c = "87222410" Or c = "87222511" Or c = "87222512" Or c = "87222709" Or c = "7407" Or c = "514" Or c = "87222513" Or c = "7407" Or c = "516" Or c = "87222514" Or c = "7407" Or c = "518" Or c = "87222503" Or c = "80379980" Or c = "80375324" Or c = "80375312" Or c = "80375311" Or c = "80371343" Or c = "80371318" Or c = "80371262" Or c = "80371256" Or c = "80371326" Or c = "80371255" Or c = "7601L613" Or c = "7301" Or c = "008" Or c = "7108" Or c = "423" Or c = "80380229" Or c = "80380231" Or c = "80380232" Or c = "80379962" Or c = "80379961" Or c = "80379960" Or c = "80376019" Or c = "80315014" Then
+i = 8
+End If
+
+If i = 1 Or i = 2 Or i = 3 Or i = 4 Or i = 5 Or i = 6 Or i = 7 Or i = 8 Or i = 9 Or i = 10 Then
+
+Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wyglad(i), material(i), material(i))
+				 Catch 
+				 End Try
+					iProperties.Material = material(i)
+					iProperties.PartColor = wyglad(i)
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & material(i), "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+Else 
+Autor = "Michał Rymut"
+question5 = MessageBox.Show("Nie odnaleziono elementu o takim numerze katalogowym" & vbLf & "Aby dodać taki element skontaktuj się z:" & vbLf & Autor & vbLf & "Czy chcesz wpisać materiał ręcznie?", "Nie odnaleziono", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+If question5 = vbYes Then
+	Try
+		MessageBox.Show("Zostaniesz poproszony o wprowadzenie materiału ręcznie" & vbLf & "Uwaga! Wprowadzony ręcznie materiał nie zmieni koloru modelu!" & vbLf & "Kolor należy wybrać ręcznie w przeglądarce Inventora", "Uwaga!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					Dim wlasny As String
+					wlasny = InputBox("Wpisz materiał: ", "Wpisz dane", "")
+						
+						'Funkcja tworzenia i ustawiania materiału
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wlasny, wlasny, wlasny)
+					 Catch
+					 End Try
+					iProperties.Material = wlasny
+					iProperties.PartColor = "Domyślna"
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & wlasny(i), "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+								Catch
+	MessageBox.Show("Błąd! Materiał nie może mieć pustej nazwy!", "BŁĄD!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+	Try
+	Dim wlasny As String
+					wlasny = InputBox("Wpisz materiał: ", "Wpisz dane", "")
+						
+						'Funkcja tworzenia i ustawiania materiału
+					
+					Dim doc As Document
+     				doc = ThisApplication.ActiveDocument
+   					Dim docAssets As Assets
+     				docAssets = doc.Assets
+    				Dim Appearance As Asset
+					Try
+     				Appearance = docAssets.Add( _
+           			 AssetTypeEnum.kAssetTypeMaterial, _
+           			 wlasny, wlasny, wlasny)
+					 Catch
+					 End Try
+					iProperties.Material = wlasny
+					iProperties.PartColor = "Domyślna"
+					MessageBox.Show("Pomyślnie ustawiono materiał jako: " & wlasny, "Zakończono polecenie", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+				Catch 
+						MessageBox.Show("No nie mogę", "Przecież mówiłem!", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+					End Try
+	End Try
+					
+
+End If
+End If
+	
+End If
+		
+	End If
+		
+	' Autor - Michał Rymut
+	
+
+		
+		
+		
+	'Zapis materiału do iproperty
+	
+	
+	customPropertySet = ThisDoc.Document.PropertySets.Item("Inventor User Defined Properties")
+Dim iprop(1) As String
+iprop(1) = "Materiał"
+
+Dim prop(1) As String
+	Try
+        prop(1) = iProperties.Value("Custom", iprop(1))
+    Catch
+        'Assume error means not found
+        customPropertySet.Add("", iprop(1))
+        iProperties.Value("Custom", iprop(1)) = "null"
+  	End Try
+	
+ Dim var(1) As String
+ 
+		If iProperties.Value("Custom", iprop(1)) = "null" Or iProperties.Value("Custom", iprop(1)) = "" Or iProperties.Value("Custom", iprop(1)) = iProperties.Material  Then
+        var(1) = iProperties.Material
+        iProperties.Value("Custom", iprop(1)) = var(1)
+		Else
+			question7 = MessageBox.Show("Wartość dla iProperty: Materiał jest już określona jako: " & vbLf & iProperties.Value("Custom", iprop(1)) & vbLf & "Czy zmienić materiał iProperty aby odpowiadał wybranemu w tym poleceniu?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+				If question7 = vbYes Then
+				var(1) = iProperties.Material
+        		iProperties.Value("Custom", iprop(1)) = var(1)
+				End If
+				
+			End If
+End Sub

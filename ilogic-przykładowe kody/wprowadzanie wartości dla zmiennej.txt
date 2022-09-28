@@ -1,0 +1,5 @@
+Dim answer1 As String
+Dim answer2 As String 
+answer1 = InputBox("Proszę wpisać wartość dla: ", "Warning", "")
+answer2 = InputBox("Proszę wpisać wartość dla: ", "Warning", "")
+MessageBox.Show(answer2 & answer1, "Wynik zapisu")

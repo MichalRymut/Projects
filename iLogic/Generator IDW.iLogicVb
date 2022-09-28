@@ -1,0 +1,12 @@
+﻿Sub Main
+	If ThisDoc.Document.DocumentType <> DocumentTypeEnum.kAssemblyDocumentObject Then
+		MsgBox("An Assembly Document must be active for this rule to work. Exiting.", vbCritical, "")
+		Exit Sub
+	End If
+	Dim oADoc As AssemblyDocument = ThisDoc.Document
+	For Each oRefDoc As Document In oADoc.AllReferencedDocuments
+		Dim oArgs As NameValueMap = ThisApplication.TransientObjects.CreateNameValueMap
+		oArgs.Add("TargetDocument", oRefDoc)
+		iLogicVb.Automation.RunExternalRuleWithArguments(oRefDoc, "Create 4 View Drawing Of Model", oArgs)
+	Next
+End Sub

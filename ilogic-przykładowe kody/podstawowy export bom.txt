@@ -1,0 +1,3 @@
+FileName = ThisDoc.FileName(False) 
+BOMFile = "C:\BOMs\" & FileName & ".xls"
+ThisBOM.Export("Structured", BOMFile, kMicrosoftExcelFormat)

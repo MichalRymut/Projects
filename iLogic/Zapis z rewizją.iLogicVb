@@ -1,0 +1,10 @@
+﻿
+
+Dim Nr_rewizji As String
+Dim i As String
+Dim Name As String
+i = InputBox("Proszę wpisać numer rewizji", "Potrzebne informacje", "1")
+Nr_rewizji = "_rev.0" & i
+Name = ThisDoc.PathAndFileName & Nr_rewizji & ".ipt"
+ThisDoc.Document.SaveAs(Name, True)
+ 

@@ -1,0 +1,47 @@
+﻿Imports System.Windows.Forms
+
+pytanie = MessageBox.Show("Czy chcesz ręcznie wybrać folder zapisu pliku excel?", "Wybór miejsca zapisu", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+If pytanie = vbYes Then
+	Dim Dialog = New FolderBrowserDialog()
+	Dialog.SelectedPath = ExportPath
+	Dialog.ShowNewFolderButton = True
+	Dialog.Description = "Choose folder: "
+		If DialogResult.OK = Dialog.ShowDialog() Then
+			ExportPath = Dialog.SelectedPath & "\"	
+			Else
+			Return
+		End If
+	FileName = ThisDoc.FileName(False) 
+	BOMFile = ExportPath & FileName & ".xls"
+			If System.IO.File.Exists(BOMFile) Then
+   				question = MessageBox.Show("Taki plik już istnieje, czy chcesz go nadpisać?", "Plik Istnieje!", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+				If question = vbYes Then
+					ThisBOM.Export("Parts Only", BOMFile, kMicrosoftExcelFormat)
+					i = MessageBox.Show("Pomyślnie zapisano listę części w wybranym folderze", "Wynik", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1)
+				End If  
+			Else
+				ThisBOM.Export("Parts Only", BOMFile, kMicrosoftExcelFormat)
+					i = MessageBox.Show("Pomyślnie zapisano listę części w wybranym folderze", "Wynik", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1)
+			End If
+			
+End If
+If pytanie = vbNo Then
+	FileName = ThisDoc.FileName(False) 
+	BOMFile = ThisDoc.Path & "\" & FileName & ".xls"
+	If System.IO.File.Exists(BOMFile) Then
+   				question = MessageBox.Show("Taki plik już istnieje, czy chcesz go nadpisać?", "Plik Istnieje!", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+				If question = vbYes Then
+	ThisBOM.Export("Parts Only", BOMFile, kMicrosoftExcelFormat)
+	i = MessageBox.Show("Pomyślnie zapisano listę części w folderze zawierającym plik złożenia", "Wynik", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1)
+				End If
+	Else
+		ThisBOM.Export("Parts Only", BOMFile, kMicrosoftExcelFormat)
+	i = MessageBox.Show("Pomyślnie zapisano listę części w folderze zawierającym plik złożenia", "Wynik", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1)
+	End If
+	
+End If
+
+
+
+
+

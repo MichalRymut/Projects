@@ -1,0 +1,22 @@
+﻿Sub Main()
+	Dim ass As AssemblyDocument = ThisApplication.ActiveDocument
+	Dim oSelSet As SelectSet = ass.SelectSet
+	If oSelSet.Count = 0 Then
+		MessageBox.Show("Proszę wybrać pliki przed uruchomieniem polecenia", "Error")
+		Exit Sub
+	End If
+	
+	Dim Occ As ComponentOccurrence
+	For Each Occ In oSelSet
+
+		Dim OccDoc As Document = Occ.Definition.Document
+
+		Dim oArgs As NameValueMap = ThisApplication.TransientObjects.CreateNameValueMap
+		oArgs.Add("TargetDocument", OccDoc)
+		iLogicVb.Automation.RunExternalRuleWithArguments(OccDoc, "Create 4 View Drawing Of Model", oArgs)
+		
+		
+	Next
+End Sub
+
+

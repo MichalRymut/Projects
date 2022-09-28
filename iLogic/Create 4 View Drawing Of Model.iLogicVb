@@ -1,0 +1,187 @@
+﻿Sub Main
+	Dim oTargetDoc As Document = Nothing
+	If RuleArguments.Exists("TargetDocument") Then
+		oTargetDoc = RuleArguments.Value("TargetDocument")
+	Else
+		oTargetDoc = ThisDoc.Document
+	End If
+	If IsNothing(oTargetDoc) Then Exit Sub
+	If oTargetDoc.DocumentType <> DocumentTypeEnum.kAssemblyDocumentObject And _
+		oTargetDoc.DocumentType <> DocumentTypeEnum.kPartDocumentObject Then
+		Exit Sub
+	End If
+	'if oTargetDoc has not been saved yet, then accessing its FullFileName will throw Error
+	Dim oTargetDocFFN As String = ""
+	Try
+		oTargetDocFFN = oTargetDoc.FullFileName
+	Catch
+		Exit Sub
+	End Try
+	If oTargetDocFFN = "" Then Exit Sub 'making sure it was filled in
+	Dim oDrawingFullFileName As String = System.IO.Path.ChangeExtension(oTargetDocFFN, ".idw")
+	If System.IO.File.Exists(oDrawingFullFileName) Then
+		oOverWrite = MsgBox("Rysunek dla tego modelu już istnieje." & vbCrLf &
+		"Czy chcesz go nadpisać?", vbYesNo + vbQuestion, "DRAWING EXISTS!")
+		If oOverWrite = vbNo Then Exit Sub
+	End If
+	
+	Dim oTPath As String = "C:\Users\Public\Documents\Autodesk\Inventor 2022\Templates\pl-PL"
+	Dim oTName As String = "Standard.idw"
+	Dim oTFullFileName As String = System.IO.Path.Combine(oTPath, oTName)
+	Dim oDDoc As DrawingDocument = Nothing
+	If System.IO.File.Exists(oTFullFileName) Then
+		oDDoc = ThisApplication.Documents.Add(DocumentTypeEnum.kDrawingDocumentObject, oTFullFileName, True)
+	Else
+		MsgBox("Plik szablonu nie został znaleziony!", vbCritical, "")
+		Exit Sub
+	End If
+
+	'Using RangeBox to get model size
+	Dim oRangeBox As Box = oTargetDoc.ComponentDefinition.RangeBox
+	Dim oXDim As Long = (oRangeBox.MaxPoint.X - oRangeBox.MinPoint.X)
+	Dim oYDim As Long = (oRangeBox.MaxPoint.Y - oRangeBox.MinPoint.Y)
+	Dim oZDim As Long = (oRangeBox.MaxPoint.Z - oRangeBox.MinPoint.Z)
+	
+	Dim oModelWidth As Long = MaxOfMany(oXDim, oYDim, oZDim)
+	Dim oModelHeight As Long = MinOfMany(oXDim, oYDim, oZDim)
+	
+	Dim oViewRotation As Double = 0.0
+	Dim oViewOrientation As ViewOrientationTypeEnum = Nothing
+	If oModelWidth = oXDim And oModelHeight = oYDim Then
+		'oViewOrientation = ViewOrientationTypeEnum.kFrontViewOrientation
+		'oViewRotation = 0
+		oViewOrientation = ViewOrientationTypeEnum.kTopViewOrientation
+		oViewRotation = 0
+	ElseIf oModelWidth = oXDim And oModelHeight = oZDim Then
+		'oViewOrientation = ViewOrientationTypeEnum.kTopViewOrientation
+		'oViewRotation = 0
+		oViewOrientation = ViewOrientationTypeEnum.kFrontViewOrientation
+		oViewRotation = 0
+	ElseIf oModelWidth = oYDim And oModelHeight = oXDim Then
+		'oViewOrientation = ViewOrientationTypeEnum.kFrontViewOrientation
+		'oViewRotation = (PI / 2)
+		oViewOrientation = ViewOrientationTypeEnum.kRightViewOrientation
+		oViewRotation = (PI / 2)
+	ElseIf oModelWidth = oYDim And oModelHeight = oZDim Then
+		'oViewOrientation = ViewOrientationTypeEnum.kRightViewOrientation
+		'oViewRotation = (PI / 2)
+		oViewOrientation = ViewOrientationTypeEnum.kFrontViewOrientation
+		oViewRotation = (PI / 2)
+	ElseIf oModelWidth = oZDim And oModelHeight = oXDim Then
+		'oViewOrientation = ViewOrientationTypeEnum.kTopViewOrientation
+		'oViewRotation = (PI / 2)
+		oViewOrientation = ViewOrientationTypeEnum.kRightViewOrientation
+		oViewRotation = 0
+	ElseIf oModelWidth = oZDim And oModelHeight = oYDim Then
+		'oViewOrientation = ViewOrientationTypeEnum.kRightViewOrientation
+		'oViewRotation = 0
+		oViewOrientation = ViewOrientationTypeEnum.kTopViewOrientation
+		oViewRotation = (PI / 2)
+	End If
+
+	'Get the size of the Active Sheet
+	Dim oSheetWidth As Double = oDDoc.ActiveSheet.Width
+	Dim oSheetHeight As Double = oDDoc.ActiveSheet.Height
+	
+	'Get size of area within border available for views (used for scaling views)
+	Dim oSideBorderOffset As Double = 5
+	Dim oTopBottomBorderOffset As Double = 0.5
+	Dim oTitleBlockHeight As Double = 2.5
+	Dim oBorderWidth As Double = oSheetWidth-(oSideBorderOffset * 2)
+	Dim oBorderHeight As Double = oSheetHeight - (oTopBottomBorderOffset * 2)
+	Dim oAreaAboveTitleBlock As Double = (oBorderHeight - oTopBottomBorderOffset) - oTitleBlockHeight
+
+	'Set view scale, based on model width
+	Dim oBViewScale As Double = 0.0
+	If oModelWidth > (oBorderWidth / 2) Then
+		oBViewScale = ((oBorderWidth / 2) / oModelWidth)
+	ElseIf oModelWidth < (oBorderWidth / 2) Then
+		oBViewScale = (oModelWidth / (oBorderWidth / 2))
+	End If
+
+	inc = 1/32
+	'oBViewScale = Round(Round(oBViewScale, 5) / inc) * inc
+	oBViewScale = 1
+	'Try creating & placing each view at 1:1 scale, then scale to needed factor.
+	Dim oTG As TransientGeometry = ThisApplication.TransientGeometry
+	Dim oViews As DrawingViews = oDDoc.ActiveSheet.DrawingViews
+	
+	Dim oFullScale As Double = 1
+	Dim oOriginPoint As Point2d = oTG.CreatePoint2d(0, 0)
+	Dim oBaseView As DrawingView = oViews.AddBaseView(oTargetDoc, oOriginPoint, oFullScale, _
+	oViewOrientation, DrawingViewStyleEnum.kHiddenLineRemovedDrawingViewStyle)
+
+	'Locations of view centerpoint columns & rows
+	Dim o1stColumn As Double = oSideBorderOffset + (oBorderWidth / 4)
+	Dim o2ndColumn As Double = oSideBorderOffset + ((oBorderWidth / 4) * 3)
+	Dim o1stRow As Double = oTopBottomBorderOffset + oTitleBlockHeight + (oAreaAboveTitleBlock / 4)
+	Dim o2ndRow As Double = oTopBottomBorderOffset + oTitleBlockHeight + ((oAreaAboveTitleBlock / 4) * 3)
+
+	'Base View center point location
+	Dim oBaseViewLocation As Point2d = oTG.CreatePoint2d(o1stColumn, o1stRow)
+
+	'Dim oBaseView As DrawingView = oViews.AddBaseView(oTargetDoc, oBaseViewLocation, oBViewScale, _
+	'oViewOrientation, DrawingViewStyleEnum.kHiddenLineRemovedDrawingViewStyle)
+	oBaseView.Rotation = oViewRotation
+	oBaseView.Position = oBaseViewLocation
+	oBaseView.Scale = oBViewScale
+	oBaseView.ScaleString = RoundToFraction(oBViewScale, 1 / 32, RoundingMethod.Round)
+	'oBaseView.Center = oBaseViewLocation
+	'oBaseView.RotateByAngle = 
+	oBaseView.IncludeMeshBodies = True
+	oBaseView.IncludeSurfaceBodies = True
+	'oBaseView.Top
+	'oBaseView.Height
+	'oBaseView.Left
+	'oBaseView.Width
+	oBaseView.Name = "Rzut główny"
+	oDDoc.Update
+	'MsgBox("Center Of View Is At:  " & oBaseView.Center.X & " , " & oBaseView.Center.Y)
+	'MsgBox("oBViewScale = " & oBaseView.ScaleString)
+
+	Dim oUpperViewInsPoint As Point2d = oTG.CreatePoint2d(o1stColumn, o2ndRow)
+	Dim oUpperView As DrawingView = oViews.AddProjectedView(oBaseView, oUpperViewInsPoint, _
+	DrawingViewStyleEnum.kFromBaseDrawingViewStyle)
+	oUpperView.Name = "Rzut górny"
+	oUpperView.IncludeMeshBodies = True
+	oUpperView.IncludeSurfaceBodies = True
+	
+	Dim oRightViewInsPoint As Point2d = oTG.CreatePoint2d(o2ndColumn, o1stRow)
+	Dim oRightView As DrawingView = oViews.AddProjectedView(oBaseView, oRightViewInsPoint, _
+	DrawingViewStyleEnum.kFromBaseDrawingViewStyle)
+	oRightView.Name = "Rzut z prawej"
+	oRightView.IncludeMeshBodies = True
+	oRightView.IncludeSurfaceBodies = True
+
+	'Dim oISOViewInsPoint As Point2d = oTG.CreatePoint2d(o2ndColumn, o2ndRow)
+	'Dim oISOView As DrawingView = oViews.AddProjectedView(oBaseView, oISOViewInsPoint, _
+	'DrawingViewStyleEnum.kShadedDrawingViewStyle)
+	'oISOView.Name = "Rzut izometryczny"
+	'oISOView.IncludeMeshBodies = True
+	'oISOView.IncludeSurfaceBodies = True
+	
+	Try
+		
+	Dim Path As String
+	Dim Path2 As String 
+	Path = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".ipt", ".idw")
+	Path2 = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".ipt", ".dwg")
+	'oDDoc.SaveAs(Path, False)
+	oDDoc.SaveAs(Path2, True)
+	
+	oDDoc.Close(True)
+	
+	Catch
+		
+	Dim Path As String
+	Dim Path2 As String
+	Path = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".iam", ".idw")
+	Path2 = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".iam", ".dwg")
+	'oDDoc.SaveAs(Path, False)
+	oDDoc.SaveAs(Path2, True)
+	
+	oDDoc.Close(True)	
+
+	End Try
+
+End Sub

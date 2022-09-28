@@ -1,0 +1,9 @@
+﻿iLogicVb.UpdateWhenDone = True
+Dim oAsm As AssemblyDocument = ThisDoc.Document
+For Each oDoc As Document In oAsm.AllReferencedDocuments
+	If oDoc.DocumentType = DocumentTypeEnum.kPartDocumentObject AndAlso oAsm.ComponentDefinition.Occurrences.AllReferencedOccurrences(oDoc).Count > 0
+		For Each derComp As DerivedPartComponent In oDoc.ComponentDefinition.ReferenceComponents.DerivedPartComponents
+			derComp.BreakLinkToFile
+		Next
+	End If
+Next

@@ -1,0 +1,112 @@
+﻿
+Public Class ThisRule
+
+    Private _pdfConvertor3D
+    Private _options As NameValueMap
+
+    Sub Main()
+
+        SetupOptions()
+
+        Dim doc As Document = ThisDoc.Document
+
+        Dim pdfFileName = GetPdfFileName(doc)
+        Publish(doc, pdfFileName)
+
+        For Each refDoc As Document In doc.AllReferencedDocuments
+            ' Only fully opened doc's can be published
+            Dim openedDoc = ThisApplication.Documents.Open(refDoc.FullFileName)
+
+            pdfFileName = GetPdfFileName(openedDoc)
+            Publish(openedDoc, pdfFileName)
+
+            openedDoc.Close(True)
+			
+        Next
+
+    End Sub
+
+    Private Function GetPdfFileName(doc As Document) As String
+        Dim file As New IO.FileInfo(doc.FullFileName)
+        'Dim path = IO.Path.Combine(file.Directory.FullName, "PDF")
+		Dim path = "C:\Users\m.rymut\Desktop\PDF 3D\"
+        If (IO.Directory.Exists(path) = False) Then
+            IO.Directory.CreateDirectory(path)
+        End If
+        path = IO.Path.Combine(path, file.Name)
+        Return IO.Path.ChangeExtension(path, "pdf")
+    End Function
+
+    Private Sub Publish(doc As Document, path As String)
+	
+      Try
+		  
+	   If doc.PropertySets(4).Item("Typ elementu").Value = "Łącznik" Then Exit Sub
+		  
+	   Catch
+	   Try
+            _options.Value("FileOutputLocation") = path
+            _pdfConvertor3D.Publish(doc, _options)
+        Catch ex As Exception
+            MsgBox(" Nie udało się wygenerować pdf 3d dla: " & path)
+        End Try
+	End Try 
+	
+	Try
+	If doc.PropertySets(4).Item("Opis").Value = "Element systemu Aluprof" Then Exit Sub
+	Catch
+	end try
+	
+	 Try
+            _options.Value("FileOutputLocation") = path
+            _pdfConvertor3D.Publish(doc, _options)
+        Catch ex As Exception
+            MsgBox(" Nie udało się wygenerować pdf 3d dla: " & path)
+        End Try
+	
+End Sub
+
+
+    Private Sub SetupOptions()
+        ' Get the 3D PDF Add-In.
+        Dim oPDFAddIn As ApplicationAddIn = ThisApplication.ApplicationAddIns.ItemById("{3EE52B28-D6E0-4EA4-8AA6-C2A266DEBB88}")
+
+        If oPDFAddIn Is Nothing Then
+            Throw New Exception("Inventor 3D PDF Addin not loaded.")
+        End If
+
+        _pdfConvertor3D = oPDFAddIn.Automation
+
+        ' Create a NameValueMap object as Options
+        _options = ThisApplication.TransientObjects.CreateNameValueMap
+
+        ' Options
+        _options.Value("ExportAnnotations") = 1
+        _options.Value("ExportWokFeatures") = 1
+        _options.Value("GenerateAndAttachSTEPFile") = False
+        _options.Value("VisualizationQuality") = AccuracyEnum.kHigh
+		_options.Value("ExportTemplate") = "C:\Users\Public\Documents\Autodesk\Inventor 2022\Templates\pl-PL\Sample Part Template.pdf"
+		
+
+        ' Set the properties to export
+        Dim sProps(5) As String
+        sProps(0) = "{F29F85E0-4FF9-1068-AB91-08002B27B3D9}:Title"  
+
+        _options.Value("ExportAllProperties") = True
+        '_options.Value("ExportProperties") = sProps
+
+        ' Set the design views to export (in inventor 2022 there are none design views)
+        Dim sDesignViews(9) As String
+        sDesignViews(0) = "Izometryczny"
+		sDesignViews(1) = "Standard"
+		sDesignViews(2) = "Głowna"
+		sDesignViews(3) = "Master"
+		sDesignViews(4) = "Przód"
+		sDesignViews(5) = "Góra"
+		sDesignViews(6) = "prawo"
+		sDesignViews(7) = "Rzut aksonometria"
+		sDesignViews(8) = "Rzut z opisami"
+		sDesignViews(9) = "Rzut aksonometryczny"
+        _options.Value("ExportDesignViewRepresentations") = sDesignViews
+    End Sub
+End Class
