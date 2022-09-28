@@ -1,2 +1,0 @@
-question = MessageBox.Show("Wartość dla: " & iprop(j) & " Nie została określona, czy chcesz określić?", "IProperty już określone", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
-					If question = vbYes Then
