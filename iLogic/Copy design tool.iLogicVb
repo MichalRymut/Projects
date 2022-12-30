@@ -1,0 +1,105 @@
+﻿Sub Main
+	If ThisDoc.Document.DocumentType <> DocumentTypeEnum.kAssemblyDocumentObject Then
+		MsgBox("Reguła pozwala kopiować wyłącznie złożenia", vbCritical, "")
+		Exit Sub
+	End If
+	Dim oADoc As AssemblyDocument = ThisDoc.Document
+	Dim oRefDocs As DocumentsEnumerator = oADoc.AllReferencedDocuments
+	If oRefDocs.Count = 0 Then Exit Sub
+	Dim sNewFullFileName As String = UseSaveAsDialog 'runs the custom Function below
+	If sNewFullFileName = "" Then Exit Sub
+	oADoc.SaveAs(sNewFullFileName, False)
+	oADoc = ThisDoc.Document
+	Dim sNewPath As String = ThisDoc.Path
+	Dim sOldPrefix As String = InputBox("Wprowadź stary przedrostek", "Warning", "")
+	Dim sNewPrefix As String = InputBox("Wprowadź nowy przedrostek", "Warning", "")
+	'this next variable is to store a list of old & new FullFileNames, so we can replace them all easier
+	Dim oDict As New Dictionary(Of String, String) 'oldFullFileName, then newFullFileName
+		Dim sprawdzacz As String
+			Dim sprawdzacz2 As String
+			Dim decyzja As String
+			Dim decyzja2 As String
+			
+	For Each oRefDoc As Document In oRefDocs 'they are already open, by default
+		
+			If oRefDoc.DocumentType = DocumentTypeEnum.kPartDocumentObject Then
+				
+				Try
+				sprawdzacz = oRefDoc.PropertySets(4).Item("Opis").Value
+		If sprawdzacz = "Element systemu Aluprof"
+					decyzja = "nie generuj"
+		Else
+					decyzja = "generuj"
+		End If
+		Catch
+				decyzja = "generuj"
+			End Try
+			
+			Try
+				sprawdzacz2 = oRefDoc.PropertySets(4).Item("Typ elementu").Value
+		If sprawdzacz2 = "Łącznik"
+					decyzja2 = "nie generuj"
+		Else
+					decyzja2 = "generuj"
+		End If
+		Catch
+				decyzja2 = "generuj"
+			End Try
+		
+		
+	If decyzja = "generuj" And decyzja2 = "generuj"
+		
+	Dim sFileName As String = System.IO.Path.GetFileName(oRefDoc.FullFileName)
+		Dim sNewFileName As String = sFileName.Replace(sOldPrefix, sNewPrefix)
+		Dim sNewFullName As String = System.IO.Path.Combine(sNewPath, sNewFileName)
+		oRefDoc.SaveAs(sNewFullName, True)
+		oDict.Add(oRefDoc.FullFileName, sNewFullName)
+	
+	End If	
+	
+	ElseIf oRefDoc.DocumentType = DocumentTypeEnum.kAssemblyDocumentObject Then
+	Dim sFileName As String = System.IO.Path.GetFileName(oRefDoc.FullFileName)
+		Dim sNewFileName As String = sFileName.Replace(sOldPrefix, sNewPrefix)
+		Dim sNewFullName As String = System.IO.Path.Combine(sNewPath, sNewFileName)
+		oRefDoc.SaveAs(sNewFullName, True)
+		oDict.Add(oRefDoc.FullFileName, sNewFullName)
+	End If
+		
+	Next 'oRefDoc
+	
+	Dim oOccs As ComponentOccurrences = oADoc.ComponentDefinition.Occurrences
+	RecursivelyReplaceAllComponents(oOccs, oDict) 'run our custom Sub below
+	If oADoc.RequiresUpdate Then oADoc.Update2(True)
+	If oADoc.Dirty Then oADoc.Save2(True)
+	ThisApplication.Documents.CloseAll(True)
+End Sub
+
+Function UseSaveAsDialog() As String 'just reaturns new file name, does not actually save
+	Dim oFileDialog As Inventor.FileDialog = Nothing
+	ThisApplication.CreateFileDialog(oFileDialog)
+	oFileDialog.DialogTitle = "Wpisz nową nazwę oraz wybierz lokalizację dla nowego złożenia"
+	oFileDialog.InitialDirectory = ThisApplication.DesignProjectManager.ActiveDesignProject.WorkspacePath
+	oFileDialog.Filter = "Autodesk Inventor Assemblies (*.iam) | *.iam"
+	oFileDialog.FileName = ThisDoc.FileName(False)
+	oFileDialog.MultiSelectEnabled = False
+	oFileDialog.OptionsEnabled = False
+	oFileDialog.InsertMode = False
+	oFileDialog.CancelError = True
+	Try : oFileDialog.ShowSave : Return oFileDialog.FileName
+	Catch : Return "" : End Try
+End Function
+
+Sub RecursivelyReplaceAllComponents(oComps As ComponentOccurrences, oFileNamePairs As Dictionary(Of String, String))
+	If IsNothing(oComps) OrElse oComps.Count = 0 Then Exit Sub
+	If IsNothing(oFileNamePairs) OrElse oFileNamePairs.Count = 0 Then Exit Sub
+	For Each oComp As ComponentOccurrence In oComps
+		For Each oPair In oFileNamePairs
+			If oComp.ReferencedDocumentDescriptor.ReferencedFileDescriptor.FullFileName = oPair.Key Then
+				Try : oComp.Replace(oPair.Value, True) : Catch : End Try
+			End If
+		Next 'oPair
+		If oComp.SubOccurrences.Count > 0 Then
+			RecursivelyReplaceAllComponents(oComp.SubOccurrences, oFileNamePairs)
+		End If
+	Next 'oComp
+End Sub
