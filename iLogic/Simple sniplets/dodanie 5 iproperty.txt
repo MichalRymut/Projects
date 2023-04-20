@@ -1,0 +1,32 @@
+customPropertySet = ThisDoc.Document.PropertySets.Item("Inventor User Defined Properties")
+
+Dim iprop(5) As String
+iprop(1) = "Materiał"
+iprop(2) = "Wykończenie"
+iprop(3) = "Kolor"
+iprop(4) = "Opis"
+iprop(5) = "Informacje dodatkowe"
+
+For k = 1 To 5
+Dim prop(k) As String
+    Try
+        prop(k) = iProperties.Value("Custom", iprop(k))
+    Catch
+        'Assume error means not found
+        customPropertySet.Add("", iprop(k))
+        iProperties.Value("Custom", iprop(k)) = "null"
+    End Try
+Next
+
+For j = 1 To 5
+    Dim var(j) As String
+    If iProperties.Value("Custom", iprop(j)) = "null" Then
+        var(j) = InputBox("Proszę wpisać wartość dla: " & iprop(j), "Warning", "")
+        iProperties.Value("Custom", iprop(j)) = var(j)
+    End If
+	
+	If iProperties.Value("Custom", iprop(j)) = "" Then
+        var(j) = InputBox("Proszę wpisać wartość dla: " & iprop(j), "Warning", "")
+        iProperties.Value("Custom", iprop(j)) = var(j)
+    End If
+Next
