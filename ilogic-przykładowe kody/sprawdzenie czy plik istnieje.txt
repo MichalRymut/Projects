@@ -1,5 +1,0 @@
-If System.IO.File.Exists("File_Path_Here") Then
-    MessageBox.Show("The file exists!")
-    Else 
-    '''Coooooode
-End If  

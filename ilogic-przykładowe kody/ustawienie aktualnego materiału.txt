@@ -1,6 +1,0 @@
-iProperties.Material = "Gold"
-
-
-
-
-
