@@ -166,8 +166,8 @@
 	Dim Path2 As String 
 	Path = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".ipt", ".idw")
 	Path2 = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".ipt", ".dwg")
-	'oDDoc.SaveAs(Path, False)
-	oDDoc.SaveAs(Path2, True)
+	oDDoc.SaveAs(Path, False)
+	'oDDoc.SaveAs(Path2, True)
 	
 	oDDoc.Close(True)
 	
@@ -177,8 +177,8 @@
 	Dim Path2 As String
 	Path = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".iam", ".idw")
 	Path2 = "C:\Users\m.rymut\Desktop\IDW\" & oTargetDoc.DisplayName.Replace(".iam", ".dwg")
-	'oDDoc.SaveAs(Path, False)
-	oDDoc.SaveAs(Path2, True)
+	oDDoc.SaveAs(Path, False)
+	'oDDoc.SaveAs(Path2, True)
 	
 	oDDoc.Close(True)	
 
