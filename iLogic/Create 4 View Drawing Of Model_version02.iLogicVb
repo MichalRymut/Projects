@@ -20,11 +20,11 @@ Sub Main
 	If oTargetDocFFN = "" Then Exit Sub 'making sure it was filled in
 	Dim oDrawingFullFileName As String = System.IO.Path.ChangeExtension(oTargetDocFFN, ".idw")
 	If System.IO.File.Exists(oDrawingFullFileName) Then
-		oOverWrite = MsgBox("Rysunek dla tego modelu już istnieje." & vbCrLf &
-		"Czy chcesz go nadpisać?", vbYesNo + vbQuestion, "DRAWING EXISTS!")
+		oOverWrite = MsgBox("Drawning already exists." & vbCrLf &
+		"Do you want to overwrite it?", vbYesNo + vbQuestion, "DRAWING EXISTS!")
 		If oOverWrite = vbNo Then Exit Sub
 	End If
-	
+	' Path for your template and name for your template
 	Dim oTPath As String = "C:\Users\Public\Documents\Autodesk\Inventor 2022\Templates\pl-PL"
 	Dim oTName As String = "Standard.idw"
 	Dim oTFullFileName As String = System.IO.Path.Combine(oTPath, oTName)
@@ -32,7 +32,7 @@ Sub Main
 	If System.IO.File.Exists(oTFullFileName) Then
 		oDDoc = ThisApplication.Documents.Add(DocumentTypeEnum.kDrawingDocumentObject, oTFullFileName, True)
 	Else
-		MsgBox("Plik szablonu nie został znaleziony!", vbCritical, "")
+		MsgBox("Template file not found!", vbCritical, "")
 		Exit Sub
 	End If
 
@@ -98,7 +98,7 @@ Sub Main
 	ElseIf oModelWidth < (oBorderWidth / 2) Then
 		oBViewScale = (oModelWidth / (oBorderWidth / 2))
 	End If
-
+	
 	inc = 1/32
 	'oBViewScale = Round(Round(oBViewScale, 5) / inc) * inc
 	oBViewScale = 1
