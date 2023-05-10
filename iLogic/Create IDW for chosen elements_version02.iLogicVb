@@ -38,7 +38,7 @@
 	End If
 	
 	
-	SharedVariable(oTFullFileName) = oTFullFileName
+	SharedVariable(oTFullFileNameG) = oTFullFileName
 	Dim Occ As ComponentOccurrence
 	For Each Occ In oSelSet
 
