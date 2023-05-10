@@ -26,7 +26,7 @@ Sub Main
 	End If
 	
 	' Get the oTFullFileName from Create IDW for chosen elements rule - its templates filepath and name
-	Dim oTFullFileName As String = SharedVariable(oTFullFileName)
+	Dim oTFullFileName As String = SharedVariable(oTFullFileNameG)
 	Dim oDDoc As DrawingDocument = Nothing
 	If System.IO.File.Exists(oTFullFileName) Then
 		oDDoc = ThisApplication.Documents.Add(DocumentTypeEnum.kDrawingDocumentObject, oTFullFileName, True)
