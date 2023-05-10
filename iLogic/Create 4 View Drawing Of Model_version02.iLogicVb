@@ -24,10 +24,9 @@ Sub Main
 		"Do you want to overwrite it?", vbYesNo + vbQuestion, "DRAWING EXISTS!")
 		If oOverWrite = vbNo Then Exit Sub
 	End If
-	' Path for your template and name for your template
-	Dim oTPath As String = "C:\Users\Public\Documents\Autodesk\Inventor 2022\Templates\pl-PL"
-	Dim oTName As String = "Standard.idw"
-	Dim oTFullFileName As String = System.IO.Path.Combine(oTPath, oTName)
+	
+	' Get the oTFullFileName from Create IDW for chosen elements rule - its templates filepath and name
+	Dim oTFullFileName As String = SharedVariable(oTFullFileName)
 	Dim oDDoc As DrawingDocument = Nothing
 	If System.IO.File.Exists(oTFullFileName) Then
 		oDDoc = ThisApplication.Documents.Add(DocumentTypeEnum.kDrawingDocumentObject, oTFullFileName, True)
