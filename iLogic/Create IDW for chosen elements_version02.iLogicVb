@@ -25,7 +25,7 @@
 	oFileDlg.Filter = "XML files (*.xml)|*.xml"
 	oFileDlg.Filter = o1 & o2 & o3 & o4 ' 3rd Party Files
 
-	'Set open location using one of these 2 options below, "1)Hard coded" or "2)Project location":
+	'Set open location using one of these 2 options below
 	'oFileDlg.InitialDirectory = "C:\TEMP\"  'Hard Coded path:
 	oFileDlg.InitialDirectory = ThisApplication.DesignProjectManager.ActiveDesignProject.WorkspacePath
 
