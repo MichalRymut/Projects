@@ -36,6 +36,7 @@
 	If oTFullFileName = "" Then 
 		Return
 	End If
+	MessageBox.Show("You selected: " & oTFullFileName , "iLogic")
 	
 	
 	SharedVariable(oTFullFileNameG) = oTFullFileName
