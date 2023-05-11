@@ -11,39 +11,21 @@ Sub Main()
 	
 	MessageBox.Show("Choose the template for drawnings", "Warning")
 	
-	oDoc = ThisDoc.Document
-	Dim oFileDlg As Inventor.FileDialog = Nothing
-	InventorVb.Application.CreateFileDialog(oFileDlg)
-
-	'3rd Party File formats:
-	o1 = "3rd Party Files |*.wire; *.CATpart; *.CATproduct;*.dlv3;"
-	o2 = "*.fusiondesign; *.idw; *.iges; *.jt; *.prt; *.obj; *.x_b; *.x_t; *.g; *.neu;"
-	o3 = "*.prt; *.asm; *.rvt; *.3dm; *.sat; *.smt; *.stp; *.ste; *.step; *.stpz; *.stl;"
-	o4 = "*.stlb; *.par; *.psm; *.asm; *.prt; *.sldprt; *.sldasm; *.model; *.session; *.exp"
-
-	'Choose the "File Type" by uncommenting one of the options below:
-	'For "ALL file Types" Comment out all lines in this section
-	oFileDlg.Filter = "Drawing Files (*.dwg) (*.idw)|*.dwg; *.idw"
-	oFileDlg.Filter = "Part Files (*.ipt)|*.ipt"
-	oFileDlg.Filter = "Assembly Files (*.iam)|*.iam"
-	oFileDlg.Filter = "XML files (*.xml)|*.xml"
-	oFileDlg.Filter = o1 & o2 & o3 & o4 ' 3rd Party Files
-
-	'Set open location using one of these 2 options below
+	Dim oDOc As Document
+	oDOc = ThisApplication.ActiveDocument
 	
-	'Your chosen path of set open location:
-	oFileDlg.InitialDirectory = "C:\Users\Public\Documents\Autodesk\"  
-	'The path that is set as workspace of this assembly:
-	'oFileDlg.InitialDirectory = ThisApplication.DesignProjectManager.ActiveDesignProject.WorkspacePath
-
-
-	'Show File Open Dialogue
+	Dim oFileDlg As Inventor.FileDialog
+	oFileDlg = Nothing
+	
+	Call ThisApplication.CreateFileDialog(oFileDlg)
+	
+	oFileDlg.Filter = "IDW Files (*.idw)|*.idw"
+	oFileDlg.InitialDirectory = "C:\Users\Public\Documents\Autodesk\" 
 	oFileDlg.DialogTitle = "Choose template file"
-	oFileDlg.ShowOpen()
+	
+	Call oFileDlg.ShowOpen
+
 	oTFullFileName = oFileDlg.FileName
-	If oTFullFileName = "" Then 
-		Return
-	End If
 	MessageBox.Show("You selected: " & oTFullFileName , "iLogic")
 	
 	'Choosing the folder in which to save drawnings.
