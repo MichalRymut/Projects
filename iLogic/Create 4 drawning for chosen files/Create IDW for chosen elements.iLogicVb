@@ -1,4 +1,4 @@
-﻿	Imports System.Windows.Forms
+﻿		Imports System.Windows.Forms
 Sub Main()
 	Dim ass As AssemblyDocument = ThisApplication.ActiveDocument
 	Dim oSelSet As SelectSet = ass.SelectSet
@@ -11,20 +11,18 @@ Sub Main()
 	
 	MessageBox.Show("Choose the template for drawnings", "Warning")
 	
-	Dim oDOc As Document
-	oDOc = ThisApplication.ActiveDocument
-	
 	Dim oFileDlg As Inventor.FileDialog
-	oFileDlg = Nothing
-	
 	Call ThisApplication.CreateFileDialog(oFileDlg)
-	
-	oFileDlg.Filter = "IDW Files (*.idw)|*.idw"
+	oFileDlg.Filter = "Drawing Files (*.idw;*.dwg)| *.idw;*.dwg"
+	oFileDlg.FilterIndex = 1
+	oFileDlg.DialogTitle = "Select drawing template"
 	oFileDlg.InitialDirectory = "C:\Users\Public\Documents\Autodesk\" 
-	oFileDlg.DialogTitle = "Choose template file"
+	oFileDlg.InsertMode = False
+	oFileDlg.MultiSelectEnabled = False
+	oFileDlg.SuppressResolutionWarnings = True
+	oFileDlg.CancelError = False
+	oFileDlg.ShowOpen
 	
-	Call oFileDlg.ShowOpen
-
 	oTFullFileName = oFileDlg.FileName
 	MessageBox.Show("You selected: " & oTFullFileName , "iLogic")
 	
