@@ -1,0 +1,107 @@
+﻿AddReference "QuickstartiLogicLibrary.dll"
+Sub Main()
+
+	Dim ex As Exception
+	break
+
+	'the rule can be run on assembly files only
+	If ThisDoc.Document.DocumentType <> Inventor.DocumentTypeEnum.kAssemblyDocumentObject 
+		Logger.Info("Rule Vault_Generate_stp applies to assembly documents only. Exited without action.")
+		Return
+	End If
+
+	'enable iLogicVault commands and validate user's login state
+	Dim iLogicVault As New QuickstartiLogicLibrary.QuickstartiLogicLib
+	If iLogicVault.LoggedIn = False
+		Logger.Error("Not Logged In to Vault! - Login first and repeat executing this rule.")
+		Exit Sub
+	End If
+
+	Dim ass As AssemblyDocument = ThisApplication.ActiveDocument
+	Dim oSelSet As SelectSet = ass.SelectSet
+	If oSelSet.Count = 0 Then
+		MessageBox.Show("Choose files before running the rule", "Error")
+		Exit Sub
+	End If
+	
+	Dim i As Integer = 0
+	Dim result As Boolean
+	Dim Occ As ComponentOccurrence
+	For Each Occ In oSelSet
+		Dim OccDoc As Document = Occ.Definition.Document
+		'Get the file path and name with extension
+		oName = System.IO.Path.GetFullPath(OccDoc.FullFileName)
+		' change extensions by removing last 3 characters and adding stp
+		lenght_oName = oName.Length
+		lenght_we = lenght_oName - 3
+		oName_we = oName.remove(lenght_we)
+		oName_ne = oName_we & "stp"
+		oNewName = oName_ne
+
+		result = ExportFiles(OccDoc, oNewName)
+		If result = True Then
+			i = i + 1
+		End If
+	Next
+	MessageBox.Show("Number of saved files: " & i, "Result")
+End Sub
+
+
+Function ExportFiles(doc As Document, NewFileName As String) As Boolean
+	' Get the STEP translator Add-In.
+	Dim oSTEPTranslator As TranslatorAddIn
+	oSTEPTranslator = ThisApplication.ApplicationAddIns.ItemById("{90AF7F40-0C01-11D5-8E83-0010B541CD80}")
+	If oSTEPTranslator Is Nothing Then
+		MsgBox("Could not access STEP translator.")
+		ExportFiles = False
+		Exit Function
+	End If
+
+	oContext = ThisApplication.TransientObjects.CreateTranslationContext
+	oContext.Type = IOMechanismEnum.kFileBrowseIOMechanism
+	oOptions = ThisApplication.TransientObjects.CreateNameValueMap
+	oData = ThisApplication.TransientObjects.CreateDataMedium
+	oData.FileName = NewFileName
+	oNewName = NewFileName
+	If oSTEPTranslator.HasSaveCopyAsOptions(doc, oContext, oOptions) Then
+		' Set application protocol.
+		' 2 = AP 203 - Configuration Controlled Design
+		' 3 = AP 214 - Automotive Design
+		oOptions.Value("ApplicationProtocolType") = 3
+		'oOptions.Value("Author") = ""
+		'oOptions.Value("Authorization") = ""
+		'oOptions.Value("Description") = ""
+		'oOptions.Value("Organization") = ""
+
+		'check if file exists and if it does, delete it.
+		Dim oFileInfo As New System.IO.FileInfo(oNewName)
+
+		Try
+			If oFileInfo.Exists = True Then
+				If (oFileInfo.Attributes) Then
+					oFileInfo.Attributes = (oFileInfo.Attributes And Not oFileInfo.Attributes.ReadOnly)
+					System.IO.File.Delete(oNewName)
+				End If
+			End If
+		
+		Catch
+			
+		End Try
+		
+		'finally save step file
+
+		oSTEPTranslator.SaveCopyAs(doc, oContext, oOptions, oData)
+		ExportFiles = True
+		' export file to vault
+		Dim iLogicVault As New QuickstartiLogicLibrary.QuickstartiLogicLib
+		Dim mVaultPath As String = iLogicVault.ConvertLocalPathToVaultPath(oNewName)
+		success = iLogicVault.AddFile(oNewName, mVaultPath, True)
+		If (success <> True)
+			Logger.Error("Failed to add/update stp file to Vault")
+		Else
+			Logger.Info("Stp file successfully created and uploaded to Vault.")
+		End If
+
+    End If
+End Function
+
